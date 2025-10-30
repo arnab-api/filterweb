@@ -1,25 +1,44 @@
-body, td, th {
+body,
+td,
+th {
   font-family: 'Open Sans', sans-serif;
 }
+
 h2 {
   margin-top: 3ex;
 }
+
 /* Forest Green, the Color Eternal Memory */
-.color-primary-0 { color: #1D5C2A }
-.color-primary-1 { color: #199099 }
-.color-primary-2 { color: #969518 }
-.color-primary-3 { color: #1AA16A }
-.color-primary-4 { color: #56A11A }
+.color-primary-0 {
+  color: #1D5C2A
+}
+
+.color-primary-1 {
+  color: #199099
+}
+
+.color-primary-2 {
+  color: #969518
+}
+
+.color-primary-3 {
+  color: #1AA16A
+}
+
+.color-primary-4 {
+  color: #56A11A
+}
 
 .nd-pageheader {
   padding: 2rem 15px;
   margin-bottom: 1.5rem;
   color: white;
   text-align: center;
-  background-color: #264d73;
+  background-color: #301934;
 }
 
-.nd-pageheader a, .nd-pageheader a.likelink {
+.nd-pageheader a,
+.nd-pageheader a.likelink {
   color: #e4f1fe;
 }
 
@@ -28,7 +47,7 @@ h2 {
   margin-top: 1.5rem;
   padding: 1rem;
   text-align: center;
-  background-color: #264d73;
+  background-color: #301934;
 }
 
 .nd-pagefooter a {
@@ -43,7 +62,8 @@ h2 {
   font-weight: 300;
 }
 
-.nd-pageheader p, .nd-pageheader h1 {
+.nd-pageheader p,
+.nd-pageheader h1 {
   margin-bottom: 0.75rem;
   font-size: 2.25rem;
   font-weight: 300;
@@ -54,11 +74,13 @@ h2 {
   margin-top: 15px;
   clear: both;
 }
+
 .citation:after {
   content: '';
   display: table;
   clear: both;
 }
+
 .citation img {
   float: left;
   margin: 0 10px 10px 0;
@@ -69,11 +91,13 @@ h2 {
   margin-top: 15px;
   clear: both;
 }
+
 .newsmedia:after {
   content: '';
   display: table;
   clear: both;
 }
+
 .newsmedia img {
   float: left;
   margin: 20px 20px 10px 0;
@@ -100,19 +124,21 @@ figcaption {
   max-width: 90%;
   width: 700px;
 }
+
 .smallfig {
   text-align: center;
   width: 90%;
 }
+
 .medfig {
   text-align: center;
   width: 90%;
 }
 
 .modal .big-modal {
-  width:auto;
-  max-width:90%;
-  max-height:80%;
+  width: auto;
+  max-width: 90%;
+  max-height: 80%;
 }
 
 .img-wrapper {
@@ -133,7 +159,7 @@ figcaption {
 
 @media (min-width: 576px) {
   .nd-pageheader {
-    padding-top:4rem;
+    padding-top: 4rem;
     padding-bottom: 4rem;
     margin-bottom: 3rem;
   }
@@ -143,14 +169,18 @@ figcaption {
   .smallfig {
     width: 65%;
   }
+
   .medfig {
     width: 75%;
   }
-  .nd-pageheader p, .nd-pageheader h1 {
+
+  .nd-pageheader p,
+  .nd-pageheader h1 {
     font-size: 2.5rem
   }
+
   .twocol-md {
-     column-count: 2;
+    column-count: 2;
   }
 }
 
@@ -158,43 +188,80 @@ figcaption {
   .smallfig {
     width: 40%;
   }
+
   .medfig {
     width: 50%;
   }
+
   #fig-arch-compare {
     width: 49%;
   }
 }
 
-.best { font: 12.5px Helvetica; }
-.best { border-collapse: collapse; border-spacing: 0; }
-.best td { position: relative; }
-.best td img { margin-top: 15px; }
-.best td .unit { font-size: 10px; position: absolute; top: 0; left: 3px; white-space: nowrap; width: 100%; text-overflow: clip; overflow: hidden; }
-.best td .score { display: none; position: absolute; top: 0; right: 3px; white-sapce: nowrap; }
+.best {
+  font: 12.5px Helvetica;
+}
+
+.best {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.best td {
+  position: relative;
+}
+
+.best td img {
+  margin-top: 15px;
+}
+
+.best td .unit {
+  font-size: 10px;
+  position: absolute;
+  top: 0;
+  left: 3px;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: clip;
+  overflow: hidden;
+}
+
+.best td .score {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 3px;
+  white-sapce: nowrap;
+}
+
 .best td:nth-child(1) {
   min-width: 28px;
   border-right: 3px solid transparent;
 }
+
 .best td .netname {
-	transform: translateX(-50%) translateY(-50%) rotate(-90deg);
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	text-align: center;
-	font: 12px helvetica;
-	white-space: nowrap;
-	padding: 4px;
+  transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  text-align: center;
+  font: 12px helvetica;
+  white-space: nowrap;
+  padding: 4px;
 }
-.best th, .best td {
+
+.best th,
+.best td {
   padding-left: 3px;
 }
+
 .best img {
   width: 100%;
 }
+
 .best .concept {
-	color: black;
-	font: 14px helvetica;
+  color: black;
+  font: 14px helvetica;
   padding-bottom: 2px;
   text-transform: capitalize;
   text-align: left;
@@ -206,23 +273,38 @@ nobr.widenobr {
 }
 
 @media (min-width: 576px) {
-  .best td .unit { font-size: inherit; }
-  .best td .netname { font-size: 14px; }
-  .best .concept { font-size: 20px; }
-   br.widenobr { white-space: nowrap; }
+  .best td .unit {
+    font-size: inherit;
+  }
+
+  .best td .netname {
+    font-size: 14px;
+  }
+
+  .best .concept {
+    font-size: 20px;
+  }
+
+  br.widenobr {
+    white-space: nowrap;
+  }
 }
 
 @media (min-width: 768px) {
-  .best td .netname { font-size: 17px; }
+  .best td .netname {
+    font-size: 17px;
+  }
 }
 
 @media (min-width: 1200px) {
-  .best td .score { display: block; }
+  .best td .score {
+    display: block;
+  }
 }
 
 .modal {
   text-align: center;
-  padding: 0!important;
+  padding: 0 !important;
 }
 
 .modal:before {
@@ -245,6 +327,7 @@ nobr.widenobr {
   margin-right: auto;
   width: 80%;
 }
+
 /* Trick for moving the media-control-panel down on chrome */
 /*
 video::-webkit-media-controls-panel {

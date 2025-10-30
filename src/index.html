@@ -2,21 +2,21 @@
 <html lang="en">
 
 <head>
-    <title>Linearity of Relation Decoding in Transformer Language Models</title>
+    <title>LLMs Process Lists With General Filter Heads</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description"
-        content="Approximating relation decoding in transormer LMs as simple linear transformations on the subject token." />
-    <meta property="og:title" content="Linearity of Relation Decoding in Transformer Language Models" />
-    <meta property="og:url" content="https://lre.baulab.info/" />
-    <meta property="og:image" content="https://lre.baulab.info/images/lre-thumb.png" />
+        content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
+    <meta property="og:title" content="LLMs Process Lists With General Filter Heads" />
+    <meta property="og:url" content="https://filter.baulab.info/" />
+    <meta property="og:image" content="https://filter.baulab.info/images/lre-thumb.png" />
     <meta property="og:description"
-        content="Approximating relation decoding in transormer LMs as simple linear transformations on the subject token." />
+        content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Linearity of Relation Decoding in Transformer Language Models" />
+    <meta name="twitter:title" content="LLMs Process Lists With General Filter Heads" />
     <meta name="twitter:description"
-        content="Updating thousands of memories in GPT by directly calculating parameter changes." />
-    <meta name="twitter:image" content="https://lre.baulab.info/images/lre-thumb.png" />
+        content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
+    <meta name="twitter:image" content="https://filter.baulab.info/images/lre-thumb.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -71,26 +71,18 @@
     <div class="nd-pageheader">
         <div class="container">
             <h1 class="lead">
-                <nobr class="widenobr">Linearity of Relation Decoding in </nobr>
-                <nobr class="widenobr">Transformer LMs</nobr>
+                <nobr class="widenobr">LLMs Process Lists With General Filter Heads</nobr>
             </h1>
             <address>
-                <nobr><a href="https://evandez.com/" target="_blank">Evan Hernandez</a><sup>1*</sup>,</nobr>
-                <nobr><a href="https://arnab-api.github.io/" target="_blank">Arnab Sen Sharma</a><sup>2*</sup>,</nobr>
-                <nobr><a href="https://github.com/TalHaklay" target="_blank">Tal Haklay</a><sup>3</sup>,</nobr>
-                <nobr><a href="https://mengk.me/" target="_blank">Kevin Meng</a><sup>1</sup>,</nobr>
-                <nobr><a href="https://www.bewitched.com/" target="_blank">Martin Wattenberg</a><sup>4</sup>,</nobr>
-                <nobr><a href="https://www.mit.edu/~jda/" target="_blank">Jacob Andreas</a><sup>1</sup>,</nobr>
-                <nobr><a href="https://www.cs.technion.ac.il/~belinkov/" target="_blank">Yonatan
-                        Belinkov</a><sup>3</sup>,
+                <nobr><a href="https://arnab-api.github.io/" target="_blank">Arnab Sen Sharma</a>,</nobr>
+                <nobr><a href="https://github.com/giordanorogers" target="_blank">Giordano Rogers</a>,
                 </nobr>
-                <nobr><a href="https://baulab.info/" target="_blank">David Bau</a><sup>2</sup></nobr>
+                <nobr><a href="http://scholar.google.co.il/citations?hl=en&user=hd7quH4AAAAJ&sortby=pubdate"
+                        target="_blank">Natalie Shapira</a>,</nobr>
+                <nobr><a href="https://baulab.info/" target="_blank">David Bau</a></nobr>
                 <br>
-                <nobr><sup>1</sup><a href="https://www.csail.mit.edu/" target="_blank">MIT CSAIL</a>,</nobr>
-                <nobr><sup>2</sup><a href="https://khoury.northeastern.edu/" target="_blank">Northeastern
+                <nobr><a href="https://khoury.northeastern.edu/" target="_blank">Northeastern
                         University</a>,</nobr>
-                <nobr><sup>3</sup><a href="https://www.cs.technion.ac.il/" target="_blank">Technion - IIT</a>;</nobr>
-                <nobr><sup>*</sup>Equal contribution</nobr>
             </address>
         </div>
     </div><!-- end nd-pageheader -->
@@ -106,18 +98,13 @@
 
             <p>
                 <a href="https://arxiv.org/pdf/2308.09124.pdf" class="d-inline-block p-3 align-top" target="_blank">
-                    <img height="100" width="78" src="images/paper-thumb.jpg" style="border:1px solid; margin: 0 38px;"
+                    <img height="100" width="78" src="images/paper-thumb.png" style="border:1px solid; margin: 0 38px;"
                         alt="ArXiv Preprint thumbnail" data-nothumb="">
                     <br>ArXiv<br>Preprint</a>
-                <a href="https://github.com/evandez/relations" class="d-inline-block p-3 align-top" target="_blank">
+                <a href="https://github.com/arnab-api/filter" class="d-inline-block p-3 align-top" target="_blank">
                     <img height="100" width="78" src="images/code-thumb.png" style="border:1px solid; margin: 0 38px;"
                         alt="Github code thumbnail" data-nothumb="">
                     <br>Source Code<br>
-                </a>
-                <a href="data" class="d-inline-block p-3 align-top" target="_blank">
-                    <img height="100" width="78" src="images/data-thumb.png" style="border:1px solid; margin: 0 38px;"
-                        alt="Dataset thumbnail" data-nothumb="">
-                    <br>Dataset<br>
                 </a>
             </p>
 
@@ -235,27 +222,29 @@
                 </figure>
 
 
-                <h2>How to cite</h2>
+                <h2>Citation</h2>
 
-                <p>This work is not yet peer-reviewed. The preprint can be cited as follows.
+                <p>This work is under review. The preprint can be cited as follows.
                 </p>
 
                 <div class="card">
                     <h3 class="card-header">bibliography</h3>
                     <div class="card-block">
                         <p style="text-indent: -3em; margin-left: 3em;" class="card-text clickselect">
-                            Evan Hernandez, Arnab Sen Sharma, Tal Haklay, Kevin Meng, Martin Wattenberg, Yonatan
-                            Belinkov, and David Bau. "<em>Linearity of Relation Decoding in Transformer Language Models.</em>" Proceedings of the 2024 International Conference on Learning Representations. <nobr>(ICLR 2024 spotlight)</nobr>
+                            Arnab Sen Sharma, Giordano Rogers, Natalie Shapira, and David Bau. "<em>LLMs Process Lists
+                                With General Filter Heads</em>" (2025). arXiv preprint.
                         </p>
                     </div>
                     <h3 class="card-header">bibtex</h3>
                     <div class="card-block">
                         <pre class="card-text clickselect">
-@inproceedings{hernandez2024linearity,
-    title={Linearity of Relation Decoding in Transformer Language Models}, 
-    author={Evan Hernandez and Arnab Sen Sharma and Tal Haklay and Kevin Meng and Martin Wattenberg and Jacob Andreas and Yonatan Belinkov and David Bau},
-    booktitle={Proceedings of the 2024 International Conference on Learning Representations},
-    year={2024},
+@article{sensharma2023filter,
+    title={LLMs Process Lists With General Filter Heads}, 
+    author={Arnab Sen Sharma and Giordano Rogers and Natalie Shapira and David Bau},
+    year={2025},
+    eprint={},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL}
 }
 </pre>
                     </div>
