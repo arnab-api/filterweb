@@ -110,24 +110,19 @@
 
             <div class="card" style="max-width: 1020px;">
                 <div class="card-block">
-                    <h3>How do Transformer LMs Decode Relations?</h3>
-                    <p style="text-align: justify;">Much of the knowledge contained in neural language models may be
-                        expressed in terms of relations.
-                        For example, the fact that Miles Davis is a trumpet player can be written as a <b>relation</b>
-                        (<i>plays the
-                            instrument</i>&nbsp;)
-                        connecting a <b>subject</b> (<i>Miles Davis</i>&nbsp;) to an <b>object</b>
-                        (<i>trumpet</i>&nbsp;).
-                    </p>
+                    <h3>How do Transformer LMs filter from a list of candidates?</h3>
                     <p style="text-align: justify;">
-                        One might expect how a language model decodes a relation to be a sequence of complex, non-linear
-                        computation spanning multiple layers. However, in this paper we show that for a subset of
-                        relations this (highly non-linear) decoding procedure can be well-approximated by a single
-                        <i>linear
-                            transformation</i> (<b style="font-family:'Times New Roman'; font-size:19px">LRE</b>) on the
-                        subject representation <b style="font-family:'Times New Roman'; font-size:19px">s</b> after some
-                        intermediate layer.
-
+                        When LLMs are asked to perform a filtering operation such as <i>find the fruit</i> in a list,
+                        they use systematic mechanisms surprisingly similar to certain functional programming patterns.
+                    <p style="text-align: justify;">
+                        We find that LLMs implement a neural analogue of filtering operations using specialized
+                        attention heads
+                        that we call <b style="font-family:'Times New Roman'; font-size:19px">filter heads</b>. These
+                        heads encode the filtering criterion (the <i>predicate</i>) in their query states of certain
+                        tokens. This encoding is sufficiently abstract that it can be transported to a different context
+                        to trigger the execution of the same filtering operation on a new list of candidates, presented
+                        in a different format/language, even in a
+                        different task.
                     </p>
                 </div><!--card-block-->
             </div><!--card-->
@@ -137,89 +132,26 @@
         <div class="row">
             <div class="col">
                 <figure class="center_image" style="margin-top: 30px">
-                    <img src="images/Paper/schematic-wide.png" style="width:100%">
+                    <img src="images/Paper/filter_head_patching.png" style="width:100%">
                     <figcaption>
-                        In an LM relations such as <em>plays the instrument</em> can be well-approximated by a linear
-                        function
-                        <b style="font-family:'Times New Roman'; font-size:19px"><i>R</i></b> that maps subject
-                        representation
-                        <b style="font-family:'Times New Roman'; font-size:19px">s</b> to object representation
-                        <b style="font-family:'Times New Roman'; font-size:19px">o</b>, which is then directy decoded.
+                        A filter head [35, 19] in Llama-70B encodes a compact representation
+                        of the predicate <em>"is this fruit?"</em>.
+                        <strong>(a)</strong> Within a prompt p<sub>src</sub> to find a fruit in a list, we examine the
+                        attention head's behavior at the last token <code>":"</code>.
+                        <strong>(b)</strong> The head focuses its attention on the one fruit in the list.
+                        <strong>(c)</strong> We examine the same attention head's behavior in a second prompt
+                        p<sub>dest</sub> searching a different list for a vehicle.
+                        <strong>(d)</strong> and we also examine the behavior of the head when patching its query state
+                        to use the q<sub>src</sub> vector from the source context.
+                        <strong>(e)</strong> The head attends to the vehicle but then
+                        <strong>(f)</strong> redirects its attention to the fruit in the new list after the query vector
+                        is patched.
+                        <strong>(g)</strong> A sparse set of attention heads work together to conduct filtering over a
+                        wide range of predicates. These filter heads are concentrated in the middle layers (out of 80
+                        layers in Llama-70B).
                     </figcaption>
                 </figure>
 
-                <h2>How to get the LRE approximating a relation decoding?</h2>
-
-                <p style="text-align: justify;">A linear approximation in form of
-                    <span style="font-family:'Times New Roman'; font-size:20px">
-                        LRE(<b>s</b>) = <i>W</i><b>s</b> + <i>b</i>
-                    </span>
-                    can be obtained by taking a first order Taylor series approximation to the LM computation, where
-                    <span style="font-family:'Times New Roman'; font-size:20px"><i>W</i></span>
-                    is the local derivative (Jacobian) of the LM computation at some subject representation
-                    <span style="font-family:'Times New Roman'; font-size:19px"><b>s<sub>0</sub></b></span>.
-                    For a range of relations we find that averaging the estimation of
-                    <span style="font-family:'Times New Roman'; font-size:19px">LRE</span>
-                    parameters on just 5 samples is enough to get a faithful approximation of LM decoding.
-
-                <figure>
-                    <img src="images/Paper/LRE_eqn.png" class="center_image" style="width: 30%;">
-                </figure>
-
-                <p style="text-align: justify;">
-                    Here
-                    <span style="font-family:'Times New Roman'; font-size:20px"><i>F</i></span>
-                    represents how LM obtains the object representation
-                    <span style="font-family:'Times New Roman'; font-size:19px"><b>o</b></span>
-                    from the subject representation
-                    <span style="font-family:'Times New Roman'; font-size:19px"><b>s</b></span>
-                    introduced within a textual context
-                    <span style="font-family:'Times New Roman'; font-size:20px"><i>c</i></span>.
-                    Kindly refer to our paper for further details.
-                </p>
-
-                <h2>How well is the LRE approximation?</h2>
-
-                <p style="text-align: justify;">
-                    We evaluate the LRE approximations on a set of 47 relations spanning 4 categories:
-                    <em>factual associations</em>, <em>commonsense knowledge</em>, <em>implicit biases</em>, and
-                    <em>linguistic
-                        knowledge</em>.
-                    We find that for almost half of the relations LRE faithfully recovers subject-object mappings for a
-                    majority
-                    of the subjects in the test set.
-                </p>
-                <p style="text-align: justify;">
-                    We also identify a set of relations where we couldn't find a good LRE approximations. For most of
-                    these
-                    relations
-                    the range was names of people and companies. We think the range for this relations are so large that
-                    LM cannot
-                    encode them in a single state, and relies on a more complex non-linear decoding procedure.
-                </p>
-
-                <figure>
-                    <img src="images/Paper/faithfulness_relationwise.jpg" class="center_image" style="width: 80%;">
-                </figure>
-
-                <h2>Attribute Lens</h2>
-                Attribute Lens, which is motivated by the idea that a hidden state
-                <span style="font-family:'Times New Roman'; font-size:20px"><b>h</b></span>
-                may contain pieces of information beyond the prediction of the immediate next token. And, an
-                <span style="font-family:'Times New Roman'; font-size:19px">LRE</span>
-                can be used to extract a certain attribute from
-                <span style="font-family:'Times New Roman'; font-size:20px"><b>h</b></span>
-                without relevant textual context.
-
-                <figure>
-                    <img src="images/Paper/attribute_lens.png" class="center_image" style="width: 80%;">
-                    <figcaption>
-                        <span style="font-family:'Times New Roman'; font-size:16px">LRE</span>
-                        approximating the relation <em>country capital</em> applied on hidden state
-                        <b style="font-family:'Times New Roman'; font-size:16px">h</b>
-                        after different layers in different token positions.
-                    </figcaption>
-                </figure>
 
 
                 <h2>Citation</h2>
