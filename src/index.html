@@ -131,6 +131,42 @@
 
         <div class="row">
             <div class="col">
+
+
+                <h2>Filter Heads</h2>
+                <p>When prompted with filtering tasks, a set of attention heads focus their attention on the correct
+                    item in the list. This behavior is consistent across a range of different situations.
+                </p>
+
+                <!-- Attention Visualization Panel -->
+                <div id="attention-panel"
+                    style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative;">
+
+                    <!-- Heatmap container -->
+                    <div id="attention-heatmap" aria-label="Attention heatmap"
+                        style="padding:4px 0; font-family: monospace; font-size: 16px; line-height: 1.6; margin-bottom: 45px;">
+                        <!-- tokens will be rendered here by JavaScript -->
+                    </div>
+
+                    <button id="load-random-btn"
+                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Load Another Example
+                    </button>
+
+                    <!-- Tooltip element (hidden by default) -->
+                    <div id="token-tooltip" role="tooltip" aria-hidden="true"
+                        style="position:fixed; z-index:9999; padding:8px 10px; background:white; color:#333; border:1px solid #ccc; border-radius:4px; font-size:14px; pointer-events:none; display:none; white-space:pre-line; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    </div>
+                </div>
+
+                <h2>Portability</h2>
+                <p>
+                    These filter heads capture the filtering criterion (the <code>predicate</code>) in their query
+                    states at certain token positions. This encoding is sufficiently abstract that it can be transported
+                    to a different context to trigger the execution of the same filtering operation on a new list of
+                    candidates.
+                </p>
+
                 <figure class="center_image" style="margin-top: 30px">
                     <img src="images/Paper/filter_head_patching.png" style="width:100%">
                     <figcaption>
@@ -151,6 +187,82 @@
                         layers in Llama-70B).
                     </figcaption>
                 </figure>
+
+                We introduce a <i>causality</i> score to check if the predicate representation is <i>causally</i>
+                influential when the LM is performing a filtering operation. If the predicate is compactly encoded in
+                the query vector of a set of filter heads, then replacing these query vectors with those from a
+                different filtering context should change the model's output to reflect the new filtering criterion. For
+                example: in the figure, after patching the LM should change its answer to <code>"Peach"</code> (or
+                whatever the task format is). In formal notation, the causality score is defined as:
+
+                <figure class="center_image" style="margin-top: 30px">
+                    <img src="images/Paper/causality.png"
+                        style="width:60%; display: block; margin-left: auto; margin-right: auto;">
+                </figure>
+
+                When the question is presented after the options, the predicate representation show strong portability
+                within the same task, and is robust to changes in format and language.
+                <br>
+                We also check predicate
+                portability across tasks with a suite of 6 tasks that require a different reduce step after the
+                filtering. We observe non-trivial portability for group of similar tasks, suggesting that a range of
+                different tasks can share the same filtering sub-circuit.
+
+                <figure class="center_image" style="margin-top: 30px">
+                    <img src="images/Paper/filter_portability.png"
+                        style="width:100%; display: block; margin-left: auto; margin-right: auto;">
+                </figure>
+
+
+                <h2>Dual Implementation of Filtering: Question-before vs Question-after</h2>
+                In the prompt if the question is presented before the list of options, we notice that the causal
+                influence of the filter heads drop to near zero. We investigate this further and find that this
+                seemingly trivial change can fundametally alter the computation implemented by the LM. When the question
+                is presented before the LM can eagerly evaluate each item in the list, as they are presented, and store
+                a flag indicating whether they satisfy the predicate or not.
+
+                <br>
+
+                We validate this flag-based eager evaluation hypothesis with a series of carefully designed causal
+                mediation analysis. If we swap this flag with another item in the list, in the question-before context
+                the LM consistently picks the item carrying the flag, while the query-after prompt doesn't show any
+                sensitivity to this intervention. Checkout our paper for more details.
+
+
+                <figure class="center_image" style="margin-top: 30px">
+                    <img src="images/Paper/flag_swap_brief.png"
+                        style="width:90%; display: block; margin-left: auto; margin-right: auto;">
+                </figure>
+
+                Our investigations reveal a dual implementation filtering strategy: on-demand filtering via filter heads
+                and using precomputed flags, mirrors lazy vs eager evaluation strategies from functional programming.
+
+                <h2>Application</h2>
+                We can leverage the distinctive attention pattern of the filter heads in practical applications such as
+                detecting the presence of false information and certain sentiment within free form text.
+
+
+                <h2>Related works</h2>
+                <p class="citation">
+                    <a href="https://belief.baulab.info/"><img src="images/citations/lookback.png" alt="prakash-2025">
+                        Nikhil Prakash, Natalie Shapira, Arnab Sen Sharma, Christoph Riedl, Yonatan Belinkov, Tamar Rott
+                        Shaham, David Bau, Atticus Geiger
+                        <i>Language Models use Lookbacks to Track Beliefs</i> 2025.
+                    </a>
+                    <br>
+                    <b>Notes:</b> LMs use a mechanism similar to the double pointers (**) in C++ to track relationships
+                    between entities in theory-of-mind reasoning tasks.
+                </p>
+                <p class="citation">
+                    <a href="https://functions.baulab.info/"><img src="images/citations/function_vector.png"
+                            alt="todd-2023">
+                        Eric Todd, Millicent L. Li, Arnab Sen Sharma, Aaron Mueller, Byron C. Wallace, David Bau.
+                        <i>Function Vectors in Large Language Models</i> 2024.
+                    </a>
+                    <br>
+                    <b>Notes:</b> LLMs encode the functional transformations demonstrated with ICL examples as compact
+                    representations in their latent space.
+                </p>
 
 
 
@@ -197,6 +309,143 @@
 
 </body>
 <script>
+    // Render attention heatmap with support for loading from JSON
+    (function () {
+        var container = document.getElementById('attention-heatmap');
+        var tooltip = document.getElementById('token-tooltip');
+        var loadBtn = document.getElementById('load-random-btn');
+        var allExamples = []; // Will store all examples from JSON
+
+        // Helper to map score (0..1) to a color (light blue -> dark blue)
+        function scoreToColor(score) {
+            var r = Math.round(255 * (1 - score));
+            var g = Math.round(255 * (1 - score));
+            var b = 255;
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+
+        // Function to render tokens and scores
+        function renderHeatmap(tokens, scores) {
+            // Clear container
+            container.innerHTML = '';
+
+            tokens.forEach(function (tok, i) {
+                var s = scores[i] || 0;
+                var s_normalized = (s - Math.min(...scores)) / (Math.max(...scores) - Math.min(...scores) + 1e-8);
+
+                // Store original token for tooltip
+                var originalToken = tok;
+                var displayToken = tok;
+                var addLineBreakAfter = false;
+
+                // Handle newline-only tokens - convert "\n" or " \n" to actual line breaks
+                // But NOT plain spaces " " which should be rendered normally
+                if (tok === '\n' || tok === ' \n') {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                    return; // Skip to next token
+                }
+
+                // Handle tokens starting with \n (like "\nAnswer")
+                if (tok.startsWith('\n')) {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                    displayToken = tok.substring(1); // Remove the leading \n for display
+                    if (displayToken === '') {
+                        return; // If only \n, we're done
+                    }
+                }
+
+                // Handle tokens ending with \n (like "?\n")
+                if (displayToken.endsWith('\n')) {
+                    displayToken = displayToken.substring(0, displayToken.length - 1); // Remove the trailing \n for display
+                    addLineBreakAfter = true;
+                    if (displayToken === '') {
+                        var br = document.createElement('br');
+                        container.appendChild(br);
+                        return; // If only \n, we're done
+                    }
+                }
+
+                var span = document.createElement('span');
+                span.className = 'att-token';
+                span.setAttribute('data-token', originalToken);
+                span.setAttribute('data-score', s.toFixed(3));
+                span.textContent = displayToken;
+                span.style.display = 'inline';
+                span.style.margin = '0';
+                span.style.padding = '0';
+                span.style.borderRadius = '0';
+                span.style.cursor = 'default';
+                span.style.background = scoreToColor(s_normalized);
+                // Use white text for darker backgrounds (higher normalized scores)
+                span.style.color = s_normalized > 0.5 ? '#fff' : '#000';
+                span.style.border = '1px solid transparent';
+
+                // mouse events for tooltip and hover effect
+                span.addEventListener('mouseenter', function () {
+                    span.style.border = '1px solid #000';
+                });
+                span.addEventListener('mousemove', function (ev) {
+                    tooltip.style.display = 'block';
+                    tooltip.setAttribute('aria-hidden', 'false');
+                    var text = '"' + originalToken + '"\n' + s.toFixed(3);
+                    tooltip.textContent = text;
+                    // position tooltip slightly above cursor
+                    var left = ev.clientX + 12;
+                    var top = ev.clientY - 28;
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                });
+                span.addEventListener('mouseleave', function () {
+                    tooltip.style.display = 'none';
+                    tooltip.setAttribute('aria-hidden', 'true');
+                    span.style.border = '1px solid transparent';
+                });
+
+                container.appendChild(span);
+
+                // Add line break after the span if token ended with \n
+                if (addLineBreakAfter) {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                }
+            });
+        }
+
+        // Load examples from JSON file
+        fetch('attn_dist/individual_examples.json')
+            .then(response => response.json())
+            .then(data => {
+                allExamples = data;
+                // Load first example by default
+                if (allExamples.length > 0) {
+                    var firstExample = allExamples[0];
+                    var tokens = firstExample.map(item => item[0]);
+                    var scores = firstExample.map(item => item[1]);
+                    renderHeatmap(tokens, scores);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading examples:', error);
+                // Fallback to dummy data
+                var tokens = ["A", " quick", " brown", " fox"];
+                var scores = [0.2, 0.4, 0.3, 0.1];
+                renderHeatmap(tokens, scores);
+            });
+
+        // Button click handler to load random example
+        loadBtn.addEventListener('click', function () {
+            if (allExamples.length > 0) {
+                var randomIndex = Math.floor(Math.random() * allExamples.length);
+                var example = allExamples[randomIndex];
+                var tokens = example.map(item => item[0]);
+                var scores = example.map(item => item[1]);
+                renderHeatmap(tokens, scores);
+            }
+        });
+    })();
+
     $(document).on('click', '.clickselect', function (ev) {
         var range = document.createRange();
         range.selectNodeContents(this);
