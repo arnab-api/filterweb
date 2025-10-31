@@ -110,10 +110,13 @@
 
             <div class="card" style="max-width: 1020px;">
                 <div class="card-block">
-                    <h3>How do Transformer LMs filter from a list of candidates?</h3>
+                    <h3>How do Transformer LMs filter from a list?</h3>
                     <p style="text-align: justify;">
-                        When LLMs are asked to perform a filtering operation such as <i>find the fruit</i> in a list,
-                        they use systematic mechanisms surprisingly similar to certain functional programming patterns.
+                        We investigate how LLMs perform filtering operation such as <i>find the fruit</i> in a list.
+                        Turns out,
+                        they use surprisingly elegant mechanisms similar to how programmers write filter functions in
+                        code.
+                    </p>
                     <p style="text-align: justify;">
                         We find that LLMs implement a neural analogue of filtering operations using specialized
                         attention heads
@@ -134,8 +137,9 @@
 
 
                 <h2>Filter Heads</h2>
-                <p>When prompted with filtering tasks, a set of attention heads focus their attention on the correct
-                    item in the list. This behavior is consistent across a range of different situations.
+                <p>Try hovering over the tokens below! When prompted with filtering tasks, a set of attention heads
+                    focus their attention on the correct item in the list. This behavior is consistent across a range of
+                    different prompts and tasks.
                 </p>
 
                 <!-- Attention Visualization Panel -->
@@ -149,7 +153,7 @@
                     </div>
 
                     <button id="load-random-btn"
-                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
                         Load Another Example
                     </button>
 
@@ -161,10 +165,12 @@
 
                 <h2>Portability</h2>
                 <p>
-                    These filter heads capture the filtering criterion (the <code>predicate</code>) in their query
-                    states at certain token positions. This encoding is sufficiently abstract that it can be transported
-                    to a different context to trigger the execution of the same filtering operation on a new list of
-                    candidates.
+                    These filter heads capture an abstract representation of the filtering criterion (the
+                    <code>predicate</code>) in their query states at certain token positions. This encoding can be
+                    transported to a different context to trigger the execution of the same filtering operation on a new
+                    list of candidates. This suggests that LLMs can implement abstract rules that can be reused in
+                    different
+                    situations.
                 </p>
 
                 <figure class="center_image" style="margin-top: 30px">
@@ -188,7 +194,7 @@
                     </figcaption>
                 </figure>
 
-                We introduce a <i>causality</i> score to check if the predicate representation is <i>causally</i>
+                We use a <i>causality</i> score to check if the predicate representation is <i>causally</i>
                 influential when the LM is performing a filtering operation. If the predicate is compactly encoded in
                 the query vector of a set of filter heads, then replacing these query vectors with those from a
                 different filtering context should change the model's output to reflect the new filtering criterion. For
@@ -204,7 +210,7 @@
                 within the same task, and is robust to changes in format and language.
                 <br>
                 We also check predicate
-                portability across tasks with a suite of 6 tasks that require a different reduce step after the
+                portability across tasks with a suite of six tasks that require a different reduce step after the
                 filtering. We observe non-trivial portability for group of similar tasks, suggesting that a range of
                 different tasks can share the same filtering sub-circuit.
 
@@ -214,19 +220,22 @@
                 </figure>
 
 
-                <h2>Dual Implementation of Filtering: Question-before vs Question-after</h2>
+                <h2>Two ways to perform filtering: Lazy vs Eager</h2>
                 In the prompt if the question is presented before the list of options, we notice that the causal
-                influence of the filter heads drop to near zero. We investigate this further and find that this
-                seemingly trivial change can fundametally alter the computation implemented by the LM. When the question
-                is presented before the LM can eagerly evaluate each item in the list, as they are presented, and store
-                a flag indicating whether they satisfy the predicate or not.
+                influence of the filter heads drop to near zero! We investigate this further and find that this
+                seemingly trivial change can fundamentally alter the computation implemented by the LM. When the
+                question
+                is presented before the LM knows what to look for upfront. So it can eagerly evaluate each item in the
+                list, as they are presented, and store
+                a "flag" in their latents, indicating whether the item satisfies the predicate or not.
 
+                <br>
                 <br>
 
                 We validate this flag-based eager evaluation hypothesis with a series of carefully designed causal
                 mediation analysis. If we swap this flag with another item in the list, in the question-before context
                 the LM consistently picks the item carrying the flag, while the query-after prompt doesn't show any
-                sensitivity to this intervention. Checkout our paper for more details.
+                sensitivity to this intervention. Checkout our paper for full details!
 
 
                 <figure class="center_image" style="margin-top: 30px">
@@ -234,16 +243,15 @@
                         style="width:90%; display: block; margin-left: auto; margin-right: auto;">
                 </figure>
 
-                Our investigations reveal a dual implementation filtering strategy: on-demand filtering via filter heads
+                This dual implementation of filtering : on-demand filtering via filter heads
                 and using precomputed flags, mirrors lazy vs eager evaluation strategies from functional programming.
 
                 <h2>Application</h2>
-                We can leverage the distinctive attention pattern of the filter heads in practical applications such as
-                detecting the presence of false information and certain sentiment within free form text. We break the
-                text in lines and append a suffix at the end asking
-                <code>"Which of the above statements are false?\nAnswer:"</code> and visualize the aggregated attention
-                distribution from the last token position. The filter heads consistent focus their attention on the last
-                token of the false statements.
+                We can leverage the distinctive attention pattern of the filter heads in practical applications. One
+                cool example: <strong>detecting false information</strong> in a free form text. The setup is simple: we
+                break text into lines, append <code>"Which of the above statements are false?\nAnswer:"</code>, and
+                watch where the filter heads look from the last token position. They consistently zero in on the last
+                tokens of the false statements!
 
                 <!-- Lie detection panel here -->
                 <!-- Lie Detection Visualization Panel -->
@@ -259,13 +267,29 @@
                     </div>
 
                     <button id="load-random-lie-btn"
-                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
                         Load Another Example
                     </button>
 
                     <!-- Tooltip element (hidden by default) -->
                     <div id="lie-token-tooltip" role="tooltip" aria-hidden="true"
                         style="position:fixed; z-index:9999; padding:8px 10px; background:white; color:#333; border:1px solid #ccc; border-radius:4px; font-size:14px; pointer-events:none; display:none; white-space:pre-line; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    </div>
+                </div>
+
+                <h2>Key Takeaways</h2>
+                <div class="card" style="background-color: #f8f9fa; border-left: 4px solid #003636;">
+                    <div class="card-block">
+                        <ul style="margin-bottom: 0;">
+                            <li><strong>Filter heads</strong> are specialized attention mechanisms that encode abstract
+                                filtering rules</li>
+                            <li>These rules are <strong>portable</strong> and <strong>generalizable</strong> - they
+                                transfer across formats, languages,
+                                and
+                                related tasks</li>
+                            <li>LLMs use <strong>two different strategies</strong> (lazy
+                                vs. eager evaluation) depending on information availability.</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -314,7 +338,7 @@
     title={LLMs Process Lists With General Filter Heads}, 
     author={Arnab Sen Sharma and Giordano Rogers and Natalie Shapira and David Bau},
     year={2025},
-    eprint={},
+    eprint={2308.09124},
     archivePrefix={arXiv},
     primaryClass={cs.CL}
 }
