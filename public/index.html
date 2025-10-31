@@ -144,7 +144,7 @@
 
                 <!-- Attention Visualization Panel -->
                 <div id="attention-panel"
-                    style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative;">
+                    style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative; min-height: 320px;">
 
                     <button id="load-random-btn"
                         style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
@@ -467,10 +467,11 @@
         }
 
         // Load examples from JSON file
-        fetch('attn_dist/individual_examples.json')
+        fetch('attn_dist/individual_examples.json', { cache: 'no-store' })
             .then(response => response.json())
             .then(data => {
                 allExamples = data;
+                console.log('Loaded ' + allExamples.length + ' examples'); // Debug log
                 // Load first example by default
                 if (allExamples.length > 0) {
                     currentIndex = 0;
@@ -612,10 +613,11 @@
         }
 
         // Load examples from JSON file
-        fetch('attn_dist/lie_detection.json')
+        fetch('attn_dist/lie_detection.json', { cache: 'no-store' })
             .then(response => response.json())
             .then(data => {
                 allExamples = data;
+                console.log('Loaded ' + allExamples.length + ' lie detection examples'); // Debug log
                 // Load first example by default
                 if (allExamples.length > 0) {
                     currentIndex = 0;
