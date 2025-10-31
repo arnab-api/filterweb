@@ -239,7 +239,35 @@
 
                 <h2>Application</h2>
                 We can leverage the distinctive attention pattern of the filter heads in practical applications such as
-                detecting the presence of false information and certain sentiment within free form text.
+                detecting the presence of false information and certain sentiment within free form text. We break the
+                text in lines and append a suffix at the end asking
+                <code>"Which of the above statements are false?\nAnswer:"</code> and visualize the aggregated attention
+                distribution from the last token position. The filter heads consistent focus their attention on the last
+                token of the false statements.
+
+                <!-- Lie detection panel here -->
+                <!-- Lie Detection Visualization Panel -->
+                <div id="lie-detection-panel"
+                    style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative;">
+
+                    <h4 style="margin-top: 0; margin-bottom: 16px; text-align: center;">False Information Detection</h4>
+
+                    <!-- Heatmap container -->
+                    <div id="lie-detection-heatmap" aria-label="Lie detection attention heatmap"
+                        style="padding:4px 0; font-family: monospace; font-size: 16px; line-height: 1.6; margin-bottom: 45px;">
+                        <!-- tokens will be rendered here by JavaScript -->
+                    </div>
+
+                    <button id="load-random-lie-btn"
+                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Load Another Example
+                    </button>
+
+                    <!-- Tooltip element (hidden by default) -->
+                    <div id="lie-token-tooltip" role="tooltip" aria-hidden="true"
+                        style="position:fixed; z-index:9999; padding:8px 10px; background:white; color:#333; border:1px solid #ccc; border-radius:4px; font-size:14px; pointer-events:none; display:none; white-space:pre-line; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    </div>
+                </div>
 
 
                 <h2>Related works</h2>
@@ -431,6 +459,143 @@
                 // Fallback to dummy data
                 var tokens = ["A", " quick", " brown", " fox"];
                 var scores = [0.2, 0.4, 0.3, 0.1];
+                renderHeatmap(tokens, scores);
+            });
+
+        // Button click handler to load random example
+        loadBtn.addEventListener('click', function () {
+            if (allExamples.length > 0) {
+                var randomIndex = Math.floor(Math.random() * allExamples.length);
+                var example = allExamples[randomIndex];
+                var tokens = example.map(item => item[0]);
+                var scores = example.map(item => item[1]);
+                renderHeatmap(tokens, scores);
+            }
+        });
+    })();
+
+    // Render lie detection heatmap with support for loading from JSON
+    (function () {
+        var container = document.getElementById('lie-detection-heatmap');
+        var tooltip = document.getElementById('lie-token-tooltip');
+        var loadBtn = document.getElementById('load-random-lie-btn');
+        var allExamples = []; // Will store all examples from JSON
+
+        // Helper to map score (0..1) to a color (white -> red)
+        function scoreToColor(score) {
+            var r = 255;
+            var g = Math.round(255 * (1 - score));
+            var b = Math.round(255 * (1 - score));
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+
+        // Function to render tokens and scores
+        function renderHeatmap(tokens, scores) {
+            // Clear container
+            container.innerHTML = '';
+
+            tokens.forEach(function (tok, i) {
+                var s = scores[i] || 0;
+                var s_normalized = (s - Math.min(...scores)) / (Math.max(...scores) - Math.min(...scores) + 1e-8);
+
+                // Store original token for tooltip
+                var originalToken = tok;
+                var displayToken = tok;
+                var addLineBreakAfter = false;
+
+                // Handle newline-only tokens - convert "\n" or " \n" to actual line breaks
+                // But NOT plain spaces " " which should be rendered normally
+                if (tok === '\n' || tok === ' \n') {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                    return; // Skip to next token
+                }
+
+                // Handle tokens starting with \n (like "\nAnswer")
+                if (tok.startsWith('\n')) {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                    displayToken = tok.substring(1); // Remove the leading \n for display
+                    if (displayToken === '') {
+                        return; // If only \n, we're done
+                    }
+                }
+
+                // Handle tokens ending with \n (like "?\n")
+                if (displayToken.endsWith('\n')) {
+                    displayToken = displayToken.substring(0, displayToken.length - 1); // Remove the trailing \n for display
+                    addLineBreakAfter = true;
+                    if (displayToken === '') {
+                        var br = document.createElement('br');
+                        container.appendChild(br);
+                        return; // If only \n, we're done
+                    }
+                }
+
+                var span = document.createElement('span');
+                span.className = 'att-token';
+                span.setAttribute('data-token', originalToken);
+                span.setAttribute('data-score', s.toFixed(3));
+                span.textContent = displayToken;
+                span.style.display = 'inline';
+                span.style.margin = '0';
+                span.style.padding = '0';
+                span.style.borderRadius = '0';
+                span.style.cursor = 'default';
+                span.style.background = scoreToColor(s_normalized);
+                // Use white text for darker backgrounds (higher normalized scores)
+                span.style.color = s_normalized > 0.5 ? '#fff' : '#000';
+                span.style.border = '1px solid transparent';
+
+                // mouse events for tooltip and hover effect
+                span.addEventListener('mouseenter', function () {
+                    span.style.border = '1px solid #000';
+                });
+                span.addEventListener('mousemove', function (ev) {
+                    tooltip.style.display = 'block';
+                    tooltip.setAttribute('aria-hidden', 'false');
+                    var text = '"' + originalToken + '"\n' + s.toFixed(3);
+                    tooltip.textContent = text;
+                    // position tooltip slightly above cursor
+                    var left = ev.clientX + 12;
+                    var top = ev.clientY - 28;
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                });
+                span.addEventListener('mouseleave', function () {
+                    tooltip.style.display = 'none';
+                    tooltip.setAttribute('aria-hidden', 'true');
+                    span.style.border = '1px solid transparent';
+                });
+
+                container.appendChild(span);
+
+                // Add line break after the span if token ended with \n
+                if (addLineBreakAfter) {
+                    var br = document.createElement('br');
+                    container.appendChild(br);
+                }
+            });
+        }
+
+        // Load examples from JSON file
+        fetch('attn_dist/lie_detection.json')
+            .then(response => response.json())
+            .then(data => {
+                allExamples = data;
+                // Load first example by default
+                if (allExamples.length > 0) {
+                    var firstExample = allExamples[0];
+                    var tokens = firstExample.map(item => item[0]);
+                    var scores = firstExample.map(item => item[1]);
+                    renderHeatmap(tokens, scores);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading lie detection examples:', error);
+                // Fallback to dummy data
+                var tokens = ["The", " statement", " is", " false"];
+                var scores = [0.2, 0.4, 0.3, 0.9];
                 renderHeatmap(tokens, scores);
             });
 
