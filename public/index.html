@@ -146,16 +146,16 @@
                 <div id="attention-panel"
                     style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative;">
 
-                    <!-- Heatmap container -->
-                    <div id="attention-heatmap" aria-label="Attention heatmap"
-                        style="padding:4px 0; font-family: monospace; font-size: 16px; line-height: 1.6; margin-bottom: 45px;">
-                        <!-- tokens will be rendered here by JavaScript -->
-                    </div>
-
                     <button id="load-random-btn"
-                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
                         Load Another Example
                     </button>
+
+                    <!-- Heatmap container -->
+                    <div id="attention-heatmap" aria-label="Attention heatmap"
+                        style="padding:4px 0; padding-top: 50px; font-family: monospace; font-size: 16px; line-height: 1.6;">
+                        <!-- tokens will be rendered here by JavaScript -->
+                    </div>
 
                     <!-- Tooltip element (hidden by default) -->
                     <div id="token-tooltip" role="tooltip" aria-hidden="true"
@@ -258,18 +258,18 @@
                 <div id="lie-detection-panel"
                     style="margin-top: 18px; margin-bottom: 18px; margin-left: auto; margin-right: auto; max-width: 1020px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff; position: relative;">
 
-                    <h4 style="margin-top: 0; margin-bottom: 16px; text-align: center;">False Information Detection</h4>
+                    <h4 style="margin-top: 0; margin-bottom: 50px; text-align: left;">False Information Detection</h4>
+
+                    <button id="load-random-lie-btn"
+                        style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Load Another Example
+                    </button>
 
                     <!-- Heatmap container -->
                     <div id="lie-detection-heatmap" aria-label="Lie detection attention heatmap"
-                        style="padding:4px 0; font-family: monospace; font-size: 16px; line-height: 1.6; margin-bottom: 45px;">
+                        style="padding:4px 0; font-family: monospace; font-size: 16px; line-height: 1.6;">
                         <!-- tokens will be rendered here by JavaScript -->
                     </div>
-
-                    <button id="load-random-lie-btn"
-                        style="position: absolute; bottom: 20px; right: 20px; padding: 8px 16px; background-color: #003636; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
-                        Load Another Example
-                    </button>
 
                     <!-- Tooltip element (hidden by default) -->
                     <div id="lie-token-tooltip" role="tooltip" aria-hidden="true"
@@ -367,6 +367,7 @@
         var tooltip = document.getElementById('token-tooltip');
         var loadBtn = document.getElementById('load-random-btn');
         var allExamples = []; // Will store all examples from JSON
+        var currentIndex = 0; // Track currently displayed example
 
         // Helper to map score (0..1) to a color (light blue -> dark blue)
         function scoreToColor(score) {
@@ -472,6 +473,7 @@
                 allExamples = data;
                 // Load first example by default
                 if (allExamples.length > 0) {
+                    currentIndex = 0;
                     var firstExample = allExamples[0];
                     var tokens = firstExample.map(item => item[0]);
                     var scores = firstExample.map(item => item[1]);
@@ -486,10 +488,16 @@
                 renderHeatmap(tokens, scores);
             });
 
-        // Button click handler to load random example
+        // Button click handler to load random example (different from current)
         loadBtn.addEventListener('click', function () {
-            if (allExamples.length > 0) {
-                var randomIndex = Math.floor(Math.random() * allExamples.length);
+            if (allExamples.length > 1) {
+                var randomIndex;
+                // Keep generating random index until we get one different from current
+                do {
+                    randomIndex = Math.floor(Math.random() * allExamples.length);
+                } while (randomIndex === currentIndex);
+
+                currentIndex = randomIndex;
                 var example = allExamples[randomIndex];
                 var tokens = example.map(item => item[0]);
                 var scores = example.map(item => item[1]);
@@ -504,6 +512,7 @@
         var tooltip = document.getElementById('lie-token-tooltip');
         var loadBtn = document.getElementById('load-random-lie-btn');
         var allExamples = []; // Will store all examples from JSON
+        var currentIndex = 0; // Track currently displayed example
 
         // Helper to map score (0..1) to a color (white -> red)
         function scoreToColor(score) {
@@ -609,6 +618,7 @@
                 allExamples = data;
                 // Load first example by default
                 if (allExamples.length > 0) {
+                    currentIndex = 0;
                     var firstExample = allExamples[0];
                     var tokens = firstExample.map(item => item[0]);
                     var scores = firstExample.map(item => item[1]);
@@ -623,10 +633,16 @@
                 renderHeatmap(tokens, scores);
             });
 
-        // Button click handler to load random example
+        // Button click handler to load random example (different from current)
         loadBtn.addEventListener('click', function () {
-            if (allExamples.length > 0) {
-                var randomIndex = Math.floor(Math.random() * allExamples.length);
+            if (allExamples.length > 1) {
+                var randomIndex;
+                // Keep generating random index until we get one different from current
+                do {
+                    randomIndex = Math.floor(Math.random() * allExamples.length);
+                } while (randomIndex === currentIndex);
+
+                currentIndex = randomIndex;
                 var example = allExamples[randomIndex];
                 var tokens = example.map(item => item[0]);
                 var scores = example.map(item => item[1]);
