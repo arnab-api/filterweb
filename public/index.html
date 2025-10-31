@@ -489,17 +489,13 @@
                 renderHeatmap(tokens, scores);
             });
 
-        // Button click handler to load random example (different from current)
+        // Button click handler to load next example (round-robin)
         loadBtn.addEventListener('click', function () {
             if (allExamples.length > 1) {
-                var randomIndex;
-                // Keep generating random index until we get one different from current
-                do {
-                    randomIndex = Math.floor(Math.random() * allExamples.length);
-                } while (randomIndex === currentIndex);
+                // Move to next example in round-robin fashion
+                currentIndex = (currentIndex + 1) % allExamples.length;
 
-                currentIndex = randomIndex;
-                var example = allExamples[randomIndex];
+                var example = allExamples[currentIndex];
                 var tokens = example.map(item => item[0]);
                 var scores = example.map(item => item[1]);
                 renderHeatmap(tokens, scores);
@@ -635,17 +631,13 @@
                 renderHeatmap(tokens, scores);
             });
 
-        // Button click handler to load random example (different from current)
+        // Button click handler to load next example (round-robin)
         loadBtn.addEventListener('click', function () {
             if (allExamples.length > 1) {
-                var randomIndex;
-                // Keep generating random index until we get one different from current
-                do {
-                    randomIndex = Math.floor(Math.random() * allExamples.length);
-                } while (randomIndex === currentIndex);
+                // Move to next example in round-robin fashion
+                currentIndex = (currentIndex + 1) % allExamples.length;
 
-                currentIndex = randomIndex;
-                var example = allExamples[randomIndex];
+                var example = allExamples[currentIndex];
                 var tokens = example.map(item => item[0]);
                 var scores = example.map(item => item[1]);
                 renderHeatmap(tokens, scores);
