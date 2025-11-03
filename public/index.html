@@ -114,19 +114,21 @@
                     <p style="text-align: justify;">
                         We investigate how LLMs perform filtering operation such as <i>find the fruit</i> in a list.
                         Turns out,
-                        they use surprisingly elegant mechanisms similar to how programmers write filter functions in
-                        code.
+                        they use surprisingly elegant mechanisms similar to how a programmer might write filter
+                        functions in code.
                     </p>
                     <p style="text-align: justify;">
                         We find that LLMs implement a neural analogue of filtering operations using specialized
                         attention heads
                         that we call <b style="font-family:'Times New Roman'; font-size:19px">filter heads</b>. These
-                        heads encode the filtering criterion (the <i>predicate</i>) in their query states of certain
+                        heads encode the filtering criterion (the <code>predicate</code>) in their query states of
+                        certain
                         tokens. This encoding is sufficiently abstract that it can be transported to a different context
                         to trigger the execution of the same filtering operation on a new list of candidates, presented
                         in a different format/language, even in a
                         different task.
                     </p>
+
                 </div>
             </div>
 
@@ -140,6 +142,10 @@
                 <p>Try hovering over the tokens below! When prompted with filtering tasks, a set of attention heads
                     focus their attention on the correct item in the list. This behavior is consistent across a range of
                     different prompts and tasks.
+                </p>
+                <p>
+                    The panel shows aggregated attention scores of a set of filter heads in Llama-70B from the last
+                    token.
                 </p>
 
                 <!-- Attention Visualization Panel -->
@@ -206,7 +212,8 @@
                         style="width:60%; display: block; margin-left: auto; margin-right: auto;">
                 </figure>
 
-                When the question is presented after the options, the predicate representation show strong portability
+                When the question is presented <i>after</i> the options, the predicate representation show strong
+                portability
                 within the same task, and is robust to changes in format and language.
                 <br>
                 We also check predicate
@@ -221,11 +228,11 @@
 
 
                 <h2>Two ways to perform filtering: Lazy vs Eager</h2>
-                In the prompt if the question is presented before the list of options, we notice that the causal
+                In the prompt if the question is presented <i>before</i> the list of options, we notice that the causal
                 influence of the filter heads drop to near zero! We investigate this further and find that this
                 seemingly trivial change can fundamentally alter the computation implemented by the LM. When the
                 question
-                is presented before the LM knows what to look for upfront. So it can eagerly evaluate each item in the
+                is presented before, the LM knows what to look for upfront. So it can eagerly evaluate each item in the
                 list, as they are presented, and store
                 a "flag" in their latents, indicating whether the item satisfies the predicate or not.
 
@@ -250,7 +257,7 @@
                 We can leverage the distinctive attention pattern of the filter heads in practical applications. One
                 cool example: <strong>detecting false information</strong> in a free form text. The setup is simple: we
                 break text into lines, append <code>"Which of the above statements are false?\nAnswer:"</code>, and
-                watch where the filter heads look from the last token position. They consistently zero in on the last
+                monitor where the filter heads look from the last token position. They consistently zero in on the last
                 tokens of the false statements!
 
                 <!-- Lie detection panel here -->
