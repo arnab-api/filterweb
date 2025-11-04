@@ -4,6 +4,7 @@
 <head>
     <title>LLMs Process Lists With General Filter Heads</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8">
     <meta name="description"
         content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
     <meta property="og:title" content="LLMs Process Lists With General Filter Heads" />
@@ -257,8 +258,11 @@
                 We can leverage the distinctive attention pattern of the filter heads in practical applications. One
                 cool example: <strong>detecting false information</strong> in a free form text. The setup is simple: we
                 break text into lines, append <code>"Which of the above statements are false?\nAnswer:"</code>, and
-                monitor where the filter heads look from the last token position. They consistently zero in on the last
-                tokens of the false statements!
+                monitor where the filter heads look from the last token position. They consistently zero in on the
+                <strong>last
+                    tokens</strong> of the false statements, which makes sense as the LM needs to read the entire
+                statement
+                to determine its veracity.
 
                 <!-- Lie detection panel here -->
                 <!-- Lie Detection Visualization Panel -->
@@ -284,18 +288,19 @@
                     </div>
                 </div>
 
-                <h2>Key Takeaways</h2>
+                <h2>💡 Key Takeaways</h2>
                 <div class="card" style="background-color: #f8f9fa; border-left: 4px solid #003636;">
                     <div class="card-block">
                         <ul style="margin-bottom: 0;">
-                            <li><strong>Filter heads</strong> are specialized attention mechanisms that encode abstract
-                                filtering rules</li>
+                            <li>LLM can implement filter operations with specialized <strong>filter heads</strong> that
+                                encode abstract
+                                filtering rules.</li>
                             <li>These rules are <strong>portable</strong> and <strong>generalizable</strong> - they
                                 transfer across formats, languages,
                                 and
-                                related tasks</li>
+                                related tasks.</li>
                             <li>LLMs use <strong>two different strategies</strong> (lazy
-                                vs. eager evaluation) depending on information availability.</li>
+                                vs. eager evaluation) depending on what information is available.</li>
                         </ul>
                     </div>
                 </div>
@@ -582,11 +587,21 @@
                 span.style.background = scoreToColor(s_normalized);
                 // Use white text for darker backgrounds (higher normalized scores)
                 span.style.color = s_normalized > 0.5 ? '#fff' : '#000';
-                span.style.border = '1px solid transparent';
+
+                // Check if this is the last token of a line (ends with .\n or .\n\n)
+                var isLineEndToken = (originalToken === '.\n' || originalToken === '.\n\n');
+                if (isLineEndToken) {
+                    span.style.border = '2px solid #000';
+                    span.style.boxShadow = '0 0 3px rgba(0,0,0,0.3)';
+                } else {
+                    span.style.border = '1px solid transparent';
+                }
 
                 // mouse events for tooltip and hover effect
                 span.addEventListener('mouseenter', function () {
-                    span.style.border = '1px solid #000';
+                    if (!isLineEndToken) {
+                        span.style.border = '1px solid #000';
+                    }
                 });
                 span.addEventListener('mousemove', function (ev) {
                     tooltip.style.display = 'block';
@@ -602,7 +617,10 @@
                 span.addEventListener('mouseleave', function () {
                     tooltip.style.display = 'none';
                     tooltip.setAttribute('aria-hidden', 'true');
-                    span.style.border = '1px solid transparent';
+                    // Only reset border for non-line-end tokens
+                    if (!isLineEndToken) {
+                        span.style.border = '1px solid transparent';
+                    }
                 });
 
                 container.appendChild(span);
