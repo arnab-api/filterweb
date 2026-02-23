@@ -9,7 +9,7 @@
         content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
     <meta property="og:title" content="LLMs Process Lists With General Filter Heads" />
     <meta property="og:url" content="https://filter.baulab.info/" />
-    <meta property="og:image" content="https://filter.baulab.info/images/lre-thumb.png" />
+    <meta property="og:image" content="https://filter.baulab.info/images/paper-thumb.png" />
     <meta property="og:description"
         content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
     <meta property="og:type" content="website" />
@@ -17,11 +17,8 @@
     <meta name="twitter:title" content="LLMs Process Lists With General Filter Heads" />
     <meta name="twitter:description"
         content="LLMs learn to implement a neural analogue of filtering operations similar to functional programming with specialized attention heads" />
-    <meta name="twitter:image" content="https://filter.baulab.info/images/lre-thumb.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <meta name="twitter:image" content="https://filter.baulab.info/images/paper-thumb.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
@@ -113,8 +110,8 @@
                 <div class="card-block">
                     <h3>How do Transformer LMs filter from a list?</h3>
                     <p style="text-align: justify;">
-                        We investigate how LLMs perform filtering operation such as <i>find the fruit</i> in a list.
-                        Turns out,
+                        We investigate how LLMs perform filtering operations such as <i>find the fruit</i> in a list.
+                        As it turns out,
                         they use surprisingly elegant mechanisms similar to how a programmer might write filter
                         functions in code.
                     </p>
@@ -190,7 +187,7 @@
                         <strong>(b)</strong> The head focuses its attention on the one fruit in the list.
                         <strong>(c)</strong> We examine the same attention head's behavior in a second prompt
                         p<sub>dest</sub> searching a different list for a vehicle.
-                        <strong>(d)</strong> and we also examine the behavior of the head when patching its query state
+                        <strong>(d)</strong> We also examine the behavior of the head when patching its query state
                         to use the q<sub>src</sub> vector from the source context.
                         <strong>(e)</strong> The head attends to the vehicle but then
                         <strong>(f)</strong> redirects its attention to the fruit in the new list after the query vector
@@ -243,7 +240,7 @@
                 We validate this flag-based eager evaluation hypothesis with a series of carefully designed causal
                 mediation analyses. If we swap this flag with another item in the list, in the question-before context
                 the LM consistently picks the item carrying the flag, while the query-after prompt doesn't show any
-                sensitivity to this intervention. Checkout our paper for full details!
+                sensitivity to this intervention. Check out our paper for full details!
 
 
                 <figure class="center_image" style="margin-top: 30px">
@@ -251,12 +248,12 @@
                         style="width:90%; display: block; margin-left: auto; margin-right: auto;">
                 </figure>
 
-                This dual implementation of filtering: on-demand filtering via filter heads
-                and using precomputed flags, mirrors lazy vs eager evaluation strategies from functional programming.
+                This dual implementation of filtering—on-demand filtering via filter heads
+                and using precomputed flags—mirrors lazy vs eager evaluation strategies from functional programming.
 
                 <h2>Application</h2>
                 We can leverage the distinctive attention pattern of the filter heads in practical applications. One
-                cool example: <strong>detecting false information</strong> in a free form text. The setup is simple: we
+                cool example: <strong>detecting false information</strong> in a free-form text. The setup is simple: we
                 break text into lines, append <code>"Which of the above statements are false?\nAnswer:"</code>, and
                 monitor where the filter heads look from the last token position. They consistently zero in on the
                 <strong>last
@@ -349,6 +346,7 @@
 @article{sensharma2023filter,
     title={LLMs Process Lists With General Filter Heads}, 
     author={Arnab Sen Sharma and Giordano Rogers and Natalie Shapira and David Bau},
+    journal={The Fourteenth International Conference on Learning Representations (ICLR 2026)}
     year={2025},
     eprint={2510.26784},
     archivePrefix={arXiv},
